@@ -66,10 +66,11 @@
         .fade-in { animation: slideUp 0.3s ease-out forwards; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Modal Z-Index set very high to ensure clicks work */
         .modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
-<body onload="showChoice()">
+<body>
 
     <div class="mesh-bg">
         <div class="orb orb-1"></div>
@@ -79,7 +80,7 @@
     <div id="choiceModal" class="modal" style="display:flex;">
         <div class="glass-card p-6 rounded-[32px] max-w-sm w-full shadow-2xl fade-in text-center max-h-[90vh] overflow-y-auto bg-white">
             <h2 class="text-2xl font-black text-slate-900 mb-1 uppercase tracking-tight">Welcome</h2>
-            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-4">Pulse kerala mission</p>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-4">BLOOD DONORS FORUM</p>
         
             <a href="https://chat.whatsapp.com/F8s10G6wEf54Ex9XMZIc7Z" target="_blank" class="w-full bg-[#25D366] p-4 rounded-xl flex items-center justify-between shadow-lg text-white hover:bg-[#20bd5a] transition-all no-underline mb-3">
                 <div class="flex flex-col items-start">
@@ -90,14 +91,21 @@
             </a>
             
             <div class="grid grid-cols-2 gap-3 mt-4">
-                <button onclick="selectMode('reg')" class="bg-white border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center shadow-sm active:scale-95 transition-all">
+                <button onclick="selectMode('reg')" class="bg-white border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center shadow-sm active:scale-95 transition-all cursor-pointer z-50">
                     <span class="text-3xl mb-1">🩸</span>
-                    <span class="text-brand font-bold text-sm">Donate</span>
+                    <span class="text-brand font-bold text-sm">Donate Blood</span>
                 </button>
-                <button onclick="selectMode('src')" class="bg-brand p-4 rounded-xl flex flex-col items-center justify-center shadow-lg active:scale-95 transition-all">
+                <button onclick="selectMode('src')" class="bg-brand p-4 rounded-xl flex flex-col items-center justify-center shadow-lg active:scale-95 transition-all cursor-pointer z-50">
                     <span class="text-3xl mb-1">🔍</span>
-                    <span class="text-white font-bold text-sm">Search</span>
+                    <span class="text-white font-bold text-sm">Search Blood</span>
                 </button>
+            </div>
+
+            <div class="mt-6 border-t border-slate-100 pt-4">
+                <p class="text-[10px] text-slate-400 font-medium">
+                    A community initiative developed by 
+                    <a href="https://icmedu.in/" target="_blank" class="font-bold text-slate-500 hover:text-brand transition-colors no-underline">ICM</a>
+                </p>
             </div>
         </div>
     </div>
@@ -105,7 +113,6 @@
     <header class="glass-header px-4 pt-6 pb-2 fixed top-0 w-full z-50 flex flex-col gap-4 items-center">
         <div class="flex flex-col items-center gap-2">
             <img src="logo.png" alt="Logo" class="h-40 w-auto object-contain">
-          
         </div>
 
         <nav class="flex p-1 bg-slate-100/80 rounded-xl w-full max-w-xs mx-auto">
@@ -191,68 +198,48 @@
     </main>
 
     <script>
+        // We define functions on 'window' to ensure they are accessible globally by HTML onclick events
+        
         // Replace with your Google Script URL
         const url = "https://script.google.com/macros/s/AKfycbx26EW3BD00D6KUskqPLliVz80KlwaxCFd3uNN0fIm2uLRwqjgFPAfYX3AsYl8XRNZyeg/exec";
 
-        function showChoice() { document.getElementById('choiceModal').style.display = 'flex'; }
-
-        function selectMode(mode) {
-            document.getElementById('choiceModal').style.display = 'none';
-            switchV(mode);
+        window.showChoice = function() {
+            document.getElementById('choiceModal').style.display = 'flex';
         }
 
-        function shareWhatsApp() {
+        window.selectMode = function(mode) {
+            document.getElementById('choiceModal').style.display = 'none';
+            window.switchV(mode);
+        }
+
+        window.shareWhatsApp = function() {
             const link = window.location.href;
             const text = encodeURIComponent("Hey! Check out the All Kerala Blood Connect. Register as a donor or find blood here: " + link);
             window.open(`https://wa.me/?text=${text}`, '_blank');
         }
 
-        function switchV(v) {
-            document.getElementById('v-reg').style.display = (v === 'reg' ? 'block' : 'none');
-            document.getElementById('v-src').style.display = (v === 'src' ? 'block' : 'none');
+        window.switchV = function(v) {
+            const reg = document.getElementById('v-reg');
+            const src = document.getElementById('v-src');
+            
+            if(reg) reg.style.display = (v === 'reg' ? 'block' : 'none');
+            if(src) src.style.display = (v === 'src' ? 'block' : 'none');
             
             const b1 = document.getElementById('b1');
             const b2 = document.getElementById('b2');
 
-            // Visual styles for active vs inactive tabs
             const active = "bg-white text-slate-900 shadow-sm ring-1 ring-black/5";
             const inactive = "text-slate-400 hover:text-slate-600";
 
-            b1.className = `flex-1 py-2.5 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all ${v === 'reg' ? active : inactive}`;
-            b2.className = `flex-1 py-2.5 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all ${v === 'src' ? active : inactive}`;
+            if(b1) b1.className = `flex-1 py-2.5 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all ${v === 'reg' ? active : inactive}`;
+            if(b2) b2.className = `flex-1 py-2.5 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all ${v === 'src' ? active : inactive}`;
             
-            // Scroll to top when switching
-            document.querySelector('.content-scroll').scrollTop = 0;
+            const scrollContainer = document.querySelector('.content-scroll');
+            if(scrollContainer) scrollContainer.scrollTop = 0;
         }
 
-        // Form Submission Logic
-        document.getElementById('f').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Safety Check: Weight
-            const weightInput = this.querySelector('input[name="data[Weight]"]');
-            if (parseInt(weightInput.value) < 45) {
-                alert("Sorry, you cannot register. Donors must weigh at least 45kg for health safety.");
-                return; 
-            }
-
-            const b = document.getElementById('sub');
-            const orig = b.innerHTML;
-            b.innerHTML = 'Wait...';
-            b.disabled = true;
-            document.getElementById('dt').value = new Date().toLocaleDateString();
-            
-            const formData = new FormData(this);
-            const data = {};
-            formData.forEach((value, key) => { data[key.replace('data[', '').replace(']', '')] = value; });
-
-            fetch(url, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
-            .then(() => { alert('Registration Successful!'); location.reload(); })
-            .catch(() => { alert('Error connecting. Please try again.'); b.innerHTML = orig; b.disabled = false; });
-        });
-
         // Search Logic
-        function findD() {
+        window.findD = function() {
             const g = document.getElementById('sg').value;
             const dst = document.getElementById('sd').value; 
             const r = document.getElementById('res');
@@ -299,8 +286,47 @@
                             </div>
                         </div>`;
                 });
+            })
+            .catch(err => {
+                console.error(err);
+                r.innerHTML = '<div class="text-center p-6 text-red-500 font-bold text-sm">Error searching. Please try again.</div>';
             });
         }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attach form listener
+            const form = document.getElementById('f');
+            if(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Safety Check: Weight
+                    const weightInput = this.querySelector('input[name="data[Weight]"]');
+                    if (parseInt(weightInput.value) < 45) {
+                        alert("Sorry, you cannot register. Donors must weigh at least 45kg for health safety.");
+                        return; 
+                    }
+
+                    const b = document.getElementById('sub');
+                    const orig = b.innerHTML;
+                    b.innerHTML = 'Wait...';
+                    b.disabled = true;
+                    document.getElementById('dt').value = new Date().toLocaleDateString();
+                    
+                    const formData = new FormData(this);
+                    const data = {};
+                    formData.forEach((value, key) => { data[key.replace('data[', '').replace(']', '')] = value; });
+
+                    fetch(url, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
+                    .then(() => { alert('Registration Successful!'); location.reload(); })
+                    .catch(() => { alert('Error connecting. Please try again.'); b.innerHTML = orig; b.disabled = false; });
+                });
+            }
+
+            // Ensure modal is visible on load (redundant check)
+            window.showChoice();
+        });
     </script>
 </body>
 </html>
